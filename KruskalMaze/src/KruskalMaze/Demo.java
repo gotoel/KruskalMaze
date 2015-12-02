@@ -5,6 +5,7 @@
 package KruskalMaze;
 
 import java.util.Random;
+import java.util.*;
 
 public class Demo extends javax.swing.JFrame {
 
@@ -18,36 +19,12 @@ public class Demo extends javax.swing.JFrame {
 
     protected Random random = null;
     protected Long seed = null; 
-    protected int w = 0;
-    protected int h = 0;
+    protected int w = 10;
+    protected int h = 10;
     protected int[][] grid = null;
     
-    public enum DX{
-        E(1), W(-1), N(0), S(0);
-        private final int value;
-        DX(final int newValue) {
-            value = newValue;
-        }
-        public int getValue() { return value; }
-    }
-    
-    public enum DY{
-        E(0), W(0), N(-1), S(1);
-        private final int value;
-        DY(final int newValue) {
-            value = newValue;
-        }
-        public int getValue() { return value; }
-    }
-    
-    public enum OPPOSITE{
-        E(8), W(4), N(2), S(1);
-        private final int value;
-        OPPOSITE(final int newValue) {
-            value = newValue;
-        }
-        public int getValue() { return value; }
-    }
+    private List<List<Tree>> sets;
+    private Stack<Edge> edges;
     
         
     public Demo() {
@@ -83,6 +60,11 @@ public class Demo extends javax.swing.JFrame {
         );
 
         jButton1.setText("Generate random");
+        jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jButton1MouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -110,6 +92,173 @@ public class Demo extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
+        System.out.println("Initilizing maze...");
+        
+        random = new Random();
+        
+        grid = new int[h][w];
+	for ( int j=0; j < h; ++j ) {
+		for ( int i=0; i < w; ++i ) {
+			grid[j][i] = 0;
+		}
+	}
+        
+        System.out.print(" ");
+	for ( int i=0; i < (w*2 - 1); ++i ) {
+		System.out.print("_");
+	}
+	System.out.println("");
+
+	// draw test
+        draw();
+        
+        
+        sets = new ArrayList<List<Tree>>();
+	for ( int y=0; y < h; ++y ) {
+		List<Tree> tmp = new ArrayList<Tree>();
+		for ( int x=0; x < w; ++x ) {
+			tmp.add(new Tree());
+		}
+		sets.add(tmp);
+	}
+		
+	edges = new Stack<Edge>();
+	for ( int y=0; y < h; ++y ) {
+		for (int x=0; x < w; ++x ) {
+			if ( y > 0 ) 	{ edges.add(new Edge(x,y,N)); }
+			if ( x > 0 ) 	{ edges.add(new Edge(x,y,W)); }
+		}
+	}
+	
+        for ( int i=0; i < edges.size(); ++i ) {
+            int pos = random.nextInt(edges.size());
+            Edge tmp1 = edges.get(i);
+            Edge tmp2 = edges.get(pos);
+            edges.set(i,tmp2);
+            edges.set(pos,tmp1);
+	}
+  
+        
+        // kruskal
+        while ( edges.size() > 0 ) {
+            Edge tmp = edges.pop();
+            int x = tmp.getX();
+            int y = tmp.getY();
+            int direction = tmp.getDirection();
+            int dx = x + DX(direction), dy = y + DY(direction);
+			
+            Tree set1 = (sets.get(y)).get(x);
+            Tree set2 = (sets.get(dy)).get(dx);
+			
+            if ( !set1.connected(set2) ) {		
+                set1.connect(set2);
+		grid[y][x] |= direction;
+		grid[dy][dx] |= oppositeOf(direction);
+            }
+	}
+ 
+        // draw test
+        draw();
+    }//GEN-LAST:event_jButton1MouseClicked
+
+    public static int DX(int direction) {
+		switch ( direction ) {
+		case E:
+			return +1;
+		case W:
+			return -1;
+		case N:
+		case S:
+			return 0;
+		}
+		return -1;
+	}
+
+	public static int DY(int direction) {
+		switch ( direction ) {
+		case E:
+		case W:
+			return 0;
+		case N:
+			return -1;
+		case S:
+			return 1;
+		}
+		return -1;
+	}
+
+	public static int oppositeOf(int direction) {
+		switch ( direction ) {
+		case E:
+			return W;
+		case W:
+			return E;
+		case N:
+			return S;
+		case S:
+			return N;
+                }
+		return -1;
+	}
+    
+    public void draw() {
+		// Draw the "top row" of the maze
+		System.out.print((char)27 + "[H");
+		System.out.print(" ");
+		for ( int i=0; i < (w*2) - 1; ++i ) {
+			System.out.print("_");
+		}
+		System.out.println("");
+		
+		// Step through the grid/maze, cell-by-cell
+		for ( int y=0; y < grid.length; ++y ) {
+			System.out.print("|");
+			for ( int x=0; x < grid[0].length; ++x ) {
+				// Start coloring, if unconnected
+				//if ( grid[y][x] == 0 ) 	{ System.out.print((char)27 + "[47m"); }
+				
+				System.out.print( ((grid[y][x] & S) != 0) ? " " : "_" );
+				if ( (grid[y][x] & E) != 0 ) {
+					System.out.print( (((grid[y][x] | grid[y][x+1]) & S) != 0) ? " " : "_" );
+				} else {
+					System.out.print("|");
+				}
+				
+				// Stop coloring, if unconnected
+				if ( grid[y][x] == 0 ) 	{ System.out.print((char)27 + "[m"); }
+			}
+			System.out.println("");
+		}
+                
+                //draw graphics
+                int startX = 10;
+                int startY = 10;
+                mazePanel.getGraphics().drawLine(0, 0, 10, 10);
+                for ( int i=0; i < (w*2) - 1; i++ ) {
+			mazePanel.getGraphics().drawLine(startX + (i*10), startY, 10, 10);
+		}
+                
+                for ( int y=0; y < grid.length; ++y ) {
+			System.out.print("|");
+                        mazePanel.getGraphics().drawLine(startX, startY + (y*10), 10, 10);
+			for ( int x=0; x < grid[0].length; ++x ) {
+				// Start coloring, if unconnected
+				//if ( grid[y][x] == 0 ) 	{ System.out.print((char)27 + "[47m"); }
+				
+				System.out.print( ((grid[y][x] & S) != 0) ? " " : "_" );
+				if ( (grid[y][x] & E) != 0 ) {
+					System.out.print( (((grid[y][x] | grid[y][x+1]) & S) != 0) ? " " : "_" );
+				} else {
+					System.out.print("|");
+				}
+				
+				// Stop coloring, if unconnected
+				if ( grid[y][x] == 0 ) 	{ System.out.print((char)27 + "[m"); }
+			}
+			System.out.println("");
+		}
+    }
     /**
      * @param args the command line arguments
      */
@@ -166,6 +315,22 @@ public class Demo extends javax.swing.JFrame {
 		this.parent = parent;
 	}
     }
+    
+    class Edge {
+	private int x;
+	private int y;
+	private int direction;
+	
+	public Edge(int x, int y, int direction) {
+		this.x = x; 
+		this.y = y;
+		this.direction = direction;
+	}
+	
+	public int getX() { return x; }
+	public int getY() { return y; }
+	public int getDirection() { return direction; }
+}
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
