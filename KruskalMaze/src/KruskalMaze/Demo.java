@@ -161,7 +161,7 @@ public class Demo extends javax.swing.JFrame {
 	// draw test
         //draw();
         
-        
+        // fill sets list with tree types
         sets = new ArrayList<List<Tree>>();
 	for ( int y=0; y < h; ++y ) {
 		List<Tree> tmp = new ArrayList<Tree>();
@@ -171,6 +171,7 @@ public class Demo extends javax.swing.JFrame {
 		sets.add(tmp);
 	}
 		
+        // Fill edge stack with new edges.
 	edges = new Stack<Edge>();
 	for ( int y=0; y < h; ++y ) {
 		for (int x=0; x < w; ++x ) {
