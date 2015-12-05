@@ -6,6 +6,7 @@ package KruskalMaze;
 
 import java.util.Random;
 import java.util.*;
+import java.lang.Thread;
 
 public class Demo extends javax.swing.JFrame {
 
@@ -14,13 +15,13 @@ public class Demo extends javax.swing.JFrame {
     public static final int E = 4;
     public static final int W = 8;
 
-    public static final int MAX_WIDTH = 10;
-    public static final int MAX_HEIGHT = 10;
+    //public static final int MAX_WIDTH = 10;
+    //public static final int MAX_HEIGHT = 10;
 
     protected Random random = null;
-    protected Long seed = null; 
-    protected int w = 10;
-    protected int h = 10;
+    private int seed; 
+    private int w;
+    private int h;
     protected int[][] grid = null;
     
     private List<List<Tree>> sets;
@@ -42,6 +43,10 @@ public class Demo extends javax.swing.JFrame {
 
         mazePanel = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
+        seedTextField = new javax.swing.JTextField();
+        jButton2 = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jTextField1 = new javax.swing.JTextField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Kruskal Maze Generator/Solver");
@@ -52,11 +57,11 @@ public class Demo extends javax.swing.JFrame {
         mazePanel.setLayout(mazePanelLayout);
         mazePanelLayout.setHorizontalGroup(
             mazePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGap(0, 680, Short.MAX_VALUE)
         );
         mazePanelLayout.setVerticalGroup(
             mazePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 411, Short.MAX_VALUE)
+            .addGap(0, 419, Short.MAX_VALUE)
         );
 
         jButton1.setText("Generate random");
@@ -65,6 +70,17 @@ public class Demo extends javax.swing.JFrame {
                 jButton1MouseClicked(evt);
             }
         });
+
+        jButton2.setText("Generate with seed:");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setText("Seed:");
+
+        jTextField1.setEditable(false);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -76,26 +92,64 @@ public class Demo extends javax.swing.JFrame {
                     .addComponent(mazePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jButton1)
-                        .addGap(0, 565, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jButton2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(seedTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(23, 23, 23)
-                .addComponent(jButton1)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButton1)
+                    .addComponent(seedTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
-                .addComponent(mazePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(mazePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel1)
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(6, 6, 6))
         );
+
+        seedTextField.getAccessibleContext().setAccessibleName("seedTextField");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
+        //  generate maze without a seed.
+        generateMaze(-1);
+    }//GEN-LAST:event_jButton1MouseClicked
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // generate maze with seed entered in textbox.
+        generateMaze(Integer.parseInt(seedTextField.getText()));
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void generateMaze(int s)
+    {
         System.out.println("Initilizing maze...");
+       
+        w = 5;
+        h = 5;
+
+        if(s >= 0) 
+            seed = s;
+        else {
+            seed = new Random().nextInt(1000);
+        }
         
-        random = new Random();
+        random = new Random(seed);
+        jTextField1.setText(seed + "");
         
         grid = new int[h][w];
 	for ( int j=0; j < h; ++j ) {
@@ -103,15 +157,9 @@ public class Demo extends javax.swing.JFrame {
 			grid[j][i] = 0;
 		}
 	}
-        
-        System.out.print(" ");
-	for ( int i=0; i < (w*2 - 1); ++i ) {
-		System.out.print("_");
-	}
-	System.out.println("");
 
 	// draw test
-        draw();
+        //draw();
         
         
         sets = new ArrayList<List<Tree>>();
@@ -156,12 +204,20 @@ public class Demo extends javax.swing.JFrame {
 		grid[y][x] |= direction;
 		grid[dy][dx] |= oppositeOf(direction);
             }
+            //drawGraphics();
 	}
  
         // draw test
         draw();
-    }//GEN-LAST:event_jButton1MouseClicked
-
+        drawGraphics();
+        //for(int i = 0; i < grid.length; i++) {
+        //    for(int j = 0; j < grid[0].length; j++)
+        //    {
+        //        System.out.print(grid[i][j] + " ");
+        //    }
+        //    System.out.println();
+        //}
+}
     public static int DX(int direction) {
 		switch ( direction ) {
 		case E:
@@ -204,59 +260,75 @@ public class Demo extends javax.swing.JFrame {
     
     public void draw() {
 		// Draw the "top row" of the maze
-		System.out.print((char)27 + "[H");
+		System.out.print((char)27);
 		System.out.print(" ");
-		for ( int i=0; i < (w*2) - 1; ++i ) {
+		for ( int i=0; i < grid.length - 1; ++i ) {
 			System.out.print("_");
 		}
 		System.out.println("");
 		
 		// Step through the grid/maze, cell-by-cell
-		for ( int y=0; y < grid.length; ++y ) {
+		for ( int y=0; y < grid[0].length; ++y ) {
 			System.out.print("|");
 			for ( int x=0; x < grid[0].length; ++x ) {
-				// Start coloring, if unconnected
-				//if ( grid[y][x] == 0 ) 	{ System.out.print((char)27 + "[47m"); }
-				
 				System.out.print( ((grid[y][x] & S) != 0) ? " " : "_" );
 				if ( (grid[y][x] & E) != 0 ) {
 					System.out.print( (((grid[y][x] | grid[y][x+1]) & S) != 0) ? " " : "_" );
 				} else {
 					System.out.print("|");
 				}
-				
-				// Stop coloring, if unconnected
-				if ( grid[y][x] == 0 ) 	{ System.out.print((char)27 + "[m"); }
 			}
 			System.out.println("");
 		}
-                
-                //draw graphics
+    }
+    
+    private void drawGraphics()
+    {
+        //clear maze panel
+        mazePanel.getGraphics().clearRect(0, 0, getWidth(), getHeight());
+        //draw graphics
                 int startX = 10;
                 int startY = 10;
+                int curX = 10;
+                int curY = 0;
                 mazePanel.getGraphics().drawLine(0, 0, 10, 10);
-                for ( int i=0; i < (w*2) - 1; i++ ) {
-			mazePanel.getGraphics().drawLine(startX + (i*10), startY, 10, 10);
+                for(int i=0; i < w; i++ ) {
+                    curX = (startX + (i*10)) + 10;
+                    mazePanel.getGraphics().drawLine(startX + (i*10), startY, curX, 10);
+                    //try {
+                    //    Thread.sleep(1000);                 //1000 milliseconds is one second.
+                    //} catch(InterruptedException ex) {
+                    //    Thread.currentThread().interrupt();
+                    //}
 		}
+                mazePanel.getGraphics().drawString("*", curX, 10+8);
                 
-                for ( int y=0; y < grid.length; ++y ) {
-			System.out.print("|");
-                        mazePanel.getGraphics().drawLine(startX, startY + (y*10), 10, 10);
+                curX = startX;
+                curY = startY;
+                for ( int y=0; y < h; ++y ) {
+                        curX = startX;
+                        curY += 10;
+                        mazePanel.getGraphics().drawLine(curX, curY-10, curX, curY);
 			for ( int x=0; x < grid[0].length; ++x ) {
-				// Start coloring, if unconnected
-				//if ( grid[y][x] == 0 ) 	{ System.out.print((char)27 + "[47m"); }
-				
-				System.out.print( ((grid[y][x] & S) != 0) ? " " : "_" );
-				if ( (grid[y][x] & E) != 0 ) {
-					System.out.print( (((grid[y][x] | grid[y][x+1]) & S) != 0) ? " " : "_" );
+                            
+                                if((grid[y][x] & S) != 0) {
+                                } else {
+                                    mazePanel.getGraphics().drawLine(curX, curY, curX+10, curY);
+                                }
+                                curX += 10;
+                                if ( (grid[y][x] & E) != 0 ) {
+                                        if(((grid[y][x] | grid[y][x+1]) & S) != 0) {
+                                        }
+                                        else
+                                        {
+                                            mazePanel.getGraphics().drawLine(curX, curY, curX+10, curY);
+                                        }
+                                        curX += 10;
 				} else {
-					System.out.print("|");
-				}
-				
-				// Stop coloring, if unconnected
-				if ( grid[y][x] == 0 ) 	{ System.out.print((char)27 + "[m"); }
+                                        curX -= 10;
+                                        mazePanel.getGraphics().drawLine(curX, curY-10, curX, curY);
+				}   
 			}
-			System.out.println("");
 		}
     }
     /**
@@ -302,7 +374,6 @@ public class Demo extends javax.swing.JFrame {
 	public Tree root() {
 		return parent != null ? parent.root() : this;
 	}
-
 	public boolean connected(Tree tree) {
 		return this.root() == tree.root();
 	}
@@ -334,6 +405,10 @@ public class Demo extends javax.swing.JFrame {
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JTextField jTextField1;
     private javax.swing.JPanel mazePanel;
+    private javax.swing.JTextField seedTextField;
     // End of variables declaration//GEN-END:variables
 }
