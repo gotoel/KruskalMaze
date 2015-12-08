@@ -4,32 +4,24 @@
  */
 package KruskalMaze;
 
+import static KruskalMaze.Demo.DX;
+import static KruskalMaze.Demo.DY;
+import static KruskalMaze.Demo.oppositeOf;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.Graphics;
+import java.awt.Point;
 import java.util.Random;
 import java.util.*;
 import java.lang.Thread;
+import javax.swing.JPanel;
 
 public class Demo extends javax.swing.JFrame {
-
-    public static final int N = 1;
-    public static final int S = 2;
-    public static final int E = 4;
-    public static final int W = 8;
-
-    //public static final int MAX_WIDTH = 10;
-    //public static final int MAX_HEIGHT = 10;
-
-    protected Random random = null;
-    private int seed; 
-    private int w;
-    private int h;
-    protected int[][] grid = null;
-    
-    private List<List<Tree>> sets;
-    private Stack<Edge> edges;
     
         
     public Demo() {
         initComponents();
+        
     }
 
     /**
@@ -47,9 +39,22 @@ public class Demo extends javax.swing.JFrame {
         jButton2 = new javax.swing.JButton();
         jLabel1 = new javax.swing.JLabel();
         jTextField1 = new javax.swing.JTextField();
+        jCheckBox1 = new javax.swing.JCheckBox();
+        jCheckBox2 = new javax.swing.JCheckBox();
+        widthTextbox = new javax.swing.JTextField();
+        heightTextbox = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        speedTextbox = new javax.swing.JTextField();
+        jCheckBox3 = new javax.swing.JCheckBox();
+        jLabel5 = new javax.swing.JLabel();
+        jTextField2 = new javax.swing.JTextField();
+        delaySlider = new javax.swing.JSlider();
+        jLabel6 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("Kruskal Maze Generator/Solver");
+        setTitle("Kruskal Maze Generator");
 
         mazePanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
@@ -61,13 +66,18 @@ public class Demo extends javax.swing.JFrame {
         );
         mazePanelLayout.setVerticalGroup(
             mazePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 419, Short.MAX_VALUE)
+            .addGap(0, 433, Short.MAX_VALUE)
         );
 
         jButton1.setText("Generate random");
         jButton1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 jButton1MouseClicked(evt);
+            }
+        });
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
             }
         });
 
@@ -82,6 +92,49 @@ public class Demo extends javax.swing.JFrame {
 
         jTextField1.setEditable(false);
 
+        jCheckBox1.setText("Animate");
+        jCheckBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBox1ActionPerformed(evt);
+            }
+        });
+
+        jCheckBox2.setText("Custom width/height");
+        jCheckBox2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBox2ActionPerformed(evt);
+            }
+        });
+
+        widthTextbox.setEnabled(false);
+
+        heightTextbox.setEnabled(false);
+
+        jLabel2.setText("Width:");
+
+        jLabel3.setText("Height:");
+
+        jLabel4.setText("Speed:");
+
+        speedTextbox.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        speedTextbox.setText("100");
+        speedTextbox.setEnabled(false);
+
+        jCheckBox3.setText("Auto-generate");
+        jCheckBox3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jCheckBox3ActionPerformed(evt);
+            }
+        });
+
+        jLabel5.setText("Auto generate thread status:");
+
+        jTextField2.setEditable(false);
+
+        delaySlider.setValue(30);
+
+        jLabel6.setText("Delay:");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -91,134 +144,166 @@ public class Demo extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(mazePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jButton2)
+                        .addComponent(jCheckBox1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(seedTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jLabel4)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(speedTextbox, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jCheckBox3))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel5)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, 154, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jButton2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(seedTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jCheckBox2)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(jLabel2)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(widthTextbox, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jLabel3)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(heightTextbox, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jButton1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel6)
+                        .addGap(18, 18, 18)
+                        .addComponent(delaySlider, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(23, 23, 23)
+                .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jCheckBox1)
+                            .addComponent(jLabel4)
+                            .addComponent(speedTextbox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jCheckBox3))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jButton1)
+                            .addComponent(jLabel6)))
+                    .addComponent(delaySlider, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jButton1)
-                    .addComponent(seedTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(seedTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(27, 27, 27)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(widthTextbox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(heightTextbox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel3)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jCheckBox2)))
                 .addGap(18, 18, 18)
-                .addComponent(mazePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(mazePanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(6, 6, 6))
+                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5)
+                    .addComponent(jTextField2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap())
         );
 
         seedTextField.getAccessibleContext().setAccessibleName("seedTextField");
+
+        getAccessibleContext().setAccessibleName("Kruskal Maze Generator");
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
         //  generate maze without a seed.
-        generateMaze(-1);
+        if(jCheckBox2.isSelected())
+            generateMaze(-1, Integer.parseInt(widthTextbox.getText()), Integer.parseInt(heightTextbox.getText()));
+        else
+            generateMaze(-1, mazePanel.getWidth(), mazePanel.getHeight());
     }//GEN-LAST:event_jButton1MouseClicked
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // generate maze with seed entered in textbox.
-        generateMaze(Integer.parseInt(seedTextField.getText()));
+        if(jCheckBox2.isSelected())
+            generateMaze(Integer.parseInt(seedTextField.getText()), Integer.parseInt(widthTextbox.getText()), Integer.parseInt(heightTextbox.getText()));
+        else
+            generateMaze(Integer.parseInt(seedTextField.getText()), mazePanel.getWidth(), mazePanel.getHeight());
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    private void generateMaze(int s)
-    {
-        System.out.println("Initilizing maze...");
-       
-        w = 5;
-        h = 5;
+    private void jCheckBox2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox2ActionPerformed
 
-        if(s >= 0) 
-            seed = s;
-        else {
-            seed = new Random().nextInt(1000);
+        widthTextbox.setEnabled(jCheckBox2.isSelected());
+        heightTextbox.setEnabled(jCheckBox2.isSelected());
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jCheckBox2ActionPerformed
+
+    private void jCheckBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox1ActionPerformed
+        speedTextbox.setEnabled(jCheckBox1.isSelected());
+    }//GEN-LAST:event_jCheckBox1ActionPerformed
+
+    private void jCheckBox3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jCheckBox3ActionPerformed
+        if(jCheckBox3.isSelected()) {
+            autoGeneratorThread = new Thread(autoGenerator);
+            autoGeneratorThread.start();
+            jTextField2.setText(autoGeneratorThread.getState()+"");
         }
-        
-        random = new Random(seed);
-        jTextField1.setText(seed + "");
-        
-        grid = new int[h][w];
-	for ( int j=0; j < h; ++j ) {
-		for ( int i=0; i < w; ++i ) {
-			grid[j][i] = 0;
-		}
-	}
-
-	// draw test
-        //draw();
-        
-        // fill sets list with tree types
-        sets = new ArrayList<List<Tree>>();
-	for ( int y=0; y < h; ++y ) {
-		List<Tree> tmp = new ArrayList<Tree>();
-		for ( int x=0; x < w; ++x ) {
-			tmp.add(new Tree());
-		}
-		sets.add(tmp);
-	}
-		
-        // Fill edge stack with new edges.
-	edges = new Stack<Edge>();
-	for ( int y=0; y < h; ++y ) {
-		for (int x=0; x < w; ++x ) {
-			if ( y > 0 ) 	{ edges.add(new Edge(x,y,N)); }
-			if ( x > 0 ) 	{ edges.add(new Edge(x,y,W)); }
-		}
-	}
-	
-        for ( int i=0; i < edges.size(); ++i ) {
-            int pos = random.nextInt(edges.size());
-            Edge tmp1 = edges.get(i);
-            Edge tmp2 = edges.get(pos);
-            edges.set(i,tmp2);
-            edges.set(pos,tmp1);
-	}
-  
-        
-        // kruskal
-        while ( edges.size() > 0 ) {
-            Edge tmp = edges.pop();
-            int x = tmp.getX();
-            int y = tmp.getY();
-            int direction = tmp.getDirection();
-            int dx = x + DX(direction), dy = y + DY(direction);
-			
-            Tree set1 = (sets.get(y)).get(x);
-            Tree set2 = (sets.get(dy)).get(dx);
-			
-            if ( !set1.connected(set2) ) {		
-                set1.connect(set2);
-		grid[y][x] |= direction;
-		grid[dy][dx] |= oppositeOf(direction);
+        else {
+            jTextField2.setText(autoGeneratorThread.getState()+"");
+            while(autoGeneratorThread.isAlive()) {
+                
             }
-            //drawGraphics();
-	}
- 
-        // draw test
-        draw();
-        drawGraphics();
-        //for(int i = 0; i < grid.length; i++) {
-        //    for(int j = 0; j < grid[0].length; j++)
-        //    {
-        //        System.out.print(grid[i][j] + " ");
-        //    }
-        //    System.out.println();
-        //}
-}
+            jTextField2.setText(autoGeneratorThread.getState()+"");
+            autoGeneratorThread = null;
+        }
+    }//GEN-LAST:event_jCheckBox3ActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    public static final int N = 1;
+    public static final int S = 2;
+    public static final int E = 4;
+    public static final int W = 8;
+
+    //public static final int MAX_WIDTH = 10;
+    //public static final int MAX_HEIGHT = 10;
+
+    protected Random random = null;
+    private int seed; 
+    private int w;
+    private int h;
+    private int cellWidth = 10;
+    private int cellHeight = 10;
+    private Color wallColor = Color.BLACK;
+    protected int[][] grid = null;
+    
+    private List<List<Demo.Tree>> sets;
+    private Stack<Demo.Edge> edges;
+    
+    private AutoGenerator autoGenerator = new AutoGenerator(this);
+    private Thread autoGeneratorThread;
+    
     public static int DX(int direction) {
 		switch ( direction ) {
 		case E:
@@ -259,79 +344,199 @@ public class Demo extends javax.swing.JFrame {
 		return -1;
 	}
     
-    public void draw() {
+    public void generateMaze(int s, int width, int height) {
+        // clear previous maze drawing
+        mazePanel.getGraphics().clearRect(0, 0, getWidth(), getHeight());
+        
+        System.out.println("Initilizing maze...");
+        if(s >= 0) 
+            seed = s;
+        else {
+            seed = new Random().nextInt(1000);
+        }
+        
+        random = new Random(seed);
+        jTextField1.setText(seed + "");
+        
+        // fit the maze to the panel
+        if(width > (mazePanel.getWidth()-20)/10)
+            w = (mazePanel.getWidth()-20)/10;
+        else
+            w = width;
+        if(height > (mazePanel.getHeight()-20)/10)
+            h = (mazePanel.getHeight()-20)/10;
+        else
+            h = height;
+            
+        System.out.println("Width: " + w + ", Height: " + h);
+        
+        grid = new int[h][w];
+	for ( int j=0; j < h; ++j ) {
+		for ( int i=0; i < w; ++i ) {
+			grid[j][i] = 0;
+		}
+	}
+
+	// draw test
+        //draw();
+        
+        // fill sets list with tree types
+        sets = new ArrayList<List<Demo.Tree>>();
+	for ( int y=0; y < h; ++y ) {
+		List<Demo.Tree> tmp = new ArrayList<Demo.Tree>();
+		for ( int x=0; x < w; ++x ) {
+			tmp.add(new Demo.Tree());
+		}
+		sets.add(tmp);
+	}
+		
+        // Fill edge stack with new edges.
+	edges = new Stack<Demo.Edge>();
+	for ( int y=0; y < h; ++y ) {
+		for (int x=0; x < w; ++x ) {
+			if ( y > 0 ) 	{ edges.add(new Demo.Edge(x,y,N)); }
+			if ( x > 0 ) 	{ edges.add(new Demo.Edge(x,y,W)); }
+		}
+	}
+	
+        for ( int i=0; i < edges.size(); ++i ) {
+            int pos = random.nextInt(edges.size());
+            Demo.Edge tmp1 = edges.get(i);
+            Demo.Edge tmp2 = edges.get(pos);
+            edges.set(i,tmp2);
+            edges.set(pos,tmp1);
+	}
+  
+        
+        // kruskal
+        int a = 0;
+        while ( edges.size() > 0 ) {
+            if(jCheckBox1.isSelected())
+                if(a % Integer.parseInt(speedTextbox.getText()) == 0)
+                    drawGraphics();
+            Demo.Edge tmp = edges.pop();
+            int x = tmp.getX();
+            int y = tmp.getY();
+            int direction = tmp.getDirection();
+            int dx = x + DX(direction), dy = y + DY(direction);
+			
+            Demo.Tree set1 = (sets.get(y)).get(x);
+            Demo.Tree set2 = (sets.get(dy)).get(dx);
+			
+            if ( !set1.connected(set2) ) {		
+                set1.connect(set2);
+		grid[y][x] |= direction;
+		grid[dy][dx] |= oppositeOf(direction);
+            }
+            a++;
+	}
+        // draw test
+        //drawText();
+        drawGraphics();
+        
+        // multi-threaded drawing
+        //Draw draw = new Draw(mazePanel, grid);
+        //Thread t = new Thread(draw);
+        //t.start();
+        
+        
+        for(int i = 0; i < grid.length; i++) {
+            for(int j = 0; j < grid[0].length; j++)
+            {
+                System.out.print(grid[i][j] + " ");
+            }
+            System.out.println();
+        }
+        
+}    
+        
+    public void drawText() {
+                mazePanel.getGraphics().clearRect(0, 0, getWidth(), getHeight());
 		// Draw the "top row" of the maze
 		System.out.print((char)27);
 		System.out.print(" ");
-		for ( int i=0; i < grid.length - 1; ++i ) {
+		for ( int i=0; i < w*2 - 1; ++i ) {
 			System.out.print("_");
 		}
 		System.out.println("");
 		
 		// Step through the grid/maze, cell-by-cell
+                int curY = 0;
+                int curX = 0;
 		for ( int y=0; y < grid[0].length; ++y ) {
+                        curY += 10;
+                        curX = 10;
 			System.out.print("|");
 			for ( int x=0; x < grid[0].length; ++x ) {
 				System.out.print( ((grid[y][x] & S) != 0) ? " " : "_" );
+                                if((grid[y][x] & S) == 0) {
+                                    curX += 10;
+                                }
+                                else if((grid[y][x] & S) == 2) {
+                                    curX += 10;
+                                }
 				if ( (grid[y][x] & E) != 0 ) {
 					System.out.print( (((grid[y][x] | grid[y][x+1]) & S) != 0) ? " " : "_" );
 				} else {
 					System.out.print("|");
 				}
+                                
+                                if ( (grid[y][x] & E) == 4 ) {
+                                    if(((grid[y][x] | grid[y][x+1]) & S) == 0)
+                                    {
+                                    }
+                                    else if(((grid[y][x] | grid[y][x+1]) & S) == 2){
+                                    }
+                                } else if ((grid[y][x] & E) == 0) {
+                                }
 			}
 			System.out.println("");
 		}
+                jTextField2.setText(autoGeneratorThread.getState() +"");
     }
+    
+    
     
     private void drawGraphics()
     {
-        //clear maze panel
-        mazePanel.getGraphics().clearRect(0, 0, getWidth(), getHeight());
-        //draw graphics
+        mazePanel.getGraphics().setFont(new Font("Arial", Font.PLAIN, 1)); 
                 int startX = 10;
                 int startY = 10;
                 int curX = 10;
                 int curY = 0;
-                mazePanel.getGraphics().drawLine(0, 0, 10, 10);
                 for(int i=0; i < w; i++ ) {
                     curX = (startX + (i*10)) + 10;
                     mazePanel.getGraphics().drawLine(startX + (i*10), startY, curX, 10);
-                    //try {
-                    //    Thread.sleep(1000);                 //1000 milliseconds is one second.
-                    //} catch(InterruptedException ex) {
-                    //    Thread.currentThread().interrupt();
-                    //}
 		}
-                mazePanel.getGraphics().drawString("*", curX, 10+8);
                 
                 curX = startX;
                 curY = startY;
                 for ( int y=0; y < h; ++y ) {
                         curX = startX;
                         curY += 10;
+                        mazePanel.getGraphics().clearRect(curX, curY-9, 10*grid[0].length, 10);
                         mazePanel.getGraphics().drawLine(curX, curY-10, curX, curY);
 			for ( int x=0; x < grid[0].length; ++x ) {
-                            
+                                //mazePanel.getGraphics().drawString(grid[y][x]+"", curX+2, curY); // debug
                                 if((grid[y][x] & S) != 0) {
+                                    curX += 10;
                                 } else {
                                     mazePanel.getGraphics().drawLine(curX, curY, curX+10, curY);
+                                    curX += 10;
                                 }
-                                curX += 10;
                                 if ( (grid[y][x] & E) != 0 ) {
                                         if(((grid[y][x] | grid[y][x+1]) & S) != 0) {
                                         }
                                         else
-                                        {
                                             mazePanel.getGraphics().drawLine(curX, curY, curX+10, curY);
-                                        }
-                                        curX += 10;
+  
 				} else {
-                                        curX -= 10;
                                         mazePanel.getGraphics().drawLine(curX, curY-10, curX, curY);
 				}   
 			}
 		}
     }
+    
     /**
      * @param args the command line arguments
      */
@@ -405,11 +610,129 @@ public class Demo extends javax.swing.JFrame {
 }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    public javax.swing.JSlider delaySlider;
+    public javax.swing.JTextField heightTextbox;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JCheckBox jCheckBox1;
+    public javax.swing.JCheckBox jCheckBox2;
+    public javax.swing.JCheckBox jCheckBox3;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JPanel mazePanel;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    public javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextField2;
+    public javax.swing.JPanel mazePanel;
     private javax.swing.JTextField seedTextField;
+    private javax.swing.JTextField speedTextbox;
+    public javax.swing.JTextField widthTextbox;
     // End of variables declaration//GEN-END:variables
+}
+
+class AutoGenerator implements Runnable {
+    Demo demo;
+    
+    public AutoGenerator(Demo d)
+    {
+        this.demo = d;
+    }
+    
+    public void run()  {
+        while(demo.jCheckBox3.isSelected()) {
+            if(demo.jCheckBox2.isSelected())
+                try {
+                demo.generateMaze(-1, Integer.parseInt(demo.widthTextbox.getText()), Integer.parseInt(demo.heightTextbox.getText()));
+                }catch(Exception e) { 
+                
+                }
+            else
+                demo.generateMaze(-1, demo.mazePanel.getWidth(), demo.mazePanel.getHeight());
+            try {
+                Thread.sleep(demo.delaySlider.getValue() * 100);
+            } catch(Exception e) {
+            }
+        }
+    }
+}
+// expiramental threading version of the maze generator
+// would make controls and the program itself run smoother.
+class Generator implements Runnable {
+    private JPanel mazePanel;
+    
+    public static final int N = 1;
+    public static final int S = 2;
+    public static final int E = 4;
+    public static final int W = 8;
+
+    //public static final int MAX_WIDTH = 10;
+    //public static final int MAX_HEIGHT = 10;
+
+    protected Random random = null;
+    private int seed; 
+    private int w;
+    private int h;
+    private int cellWidth = 10;
+    private int cellHeight = 10;
+    private Color wallColor = Color.BLACK;
+    protected int[][] grid = null;
+    
+    private List<List<Demo.Tree>> sets;
+    private Stack<Demo.Edge> edges;
+    
+    Demo demo;
+    
+    public Generator(Demo d, int s, int width, int height) {
+        this.demo = d;
+    }
+
+    public void run() {
+        
+    }
+    
+    private void draw() {
+        int startX = 10;
+                int startY = 10;
+                int curX = 10;
+                int curY = 0;
+                for(int i=0; i < grid[0].length; i++ ) {
+                    curX = (startX + (i*10)) + 10;
+                    mazePanel.getGraphics().drawLine(startX + (i*10), startY, curX, 10);
+                    //try {
+                    //    Thread.sleep(1000);                 //1000 milliseconds is one second.
+                    //} catch(InterruptedException ex) {
+                    //    Thread.currentThread().interrupt();
+                    //}
+		}
+                
+                curX = startX;
+                curY = startY;
+                for ( int y=0; y < grid.length; ++y ) {
+                        curX = startX;
+                        curY += 10;
+                        mazePanel.getGraphics().clearRect(curX, curY-9, 10*grid[0].length, 10);
+                        mazePanel.getGraphics().drawLine(curX, curY-10, curX, curY);
+			for ( int x=0; x < grid[0].length; ++x ) {
+                                if((grid[y][x] & S) != 0) {
+                                    curX += 10;
+                                } else {
+                                    mazePanel.getGraphics().drawLine(curX, curY, curX+10, curY);
+                                    curX += 10;
+                                }
+                                if ( (grid[y][x] & E) != 0 ) {
+                                        if(((grid[y][x] | grid[y][x+1]) & S) != 0) {
+                                        }
+                                        else
+                                        {
+                                            mazePanel.getGraphics().drawLine(curX, curY, curX+10, curY);
+                                        }
+  
+				} else {
+                                        mazePanel.getGraphics().drawLine(curX, curY-10, curX, curY);
+				}   
+			}
+		}
+    }
 }
