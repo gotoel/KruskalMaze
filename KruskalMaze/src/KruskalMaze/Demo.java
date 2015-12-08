@@ -284,9 +284,6 @@ public class Demo extends javax.swing.JFrame {
     public static final int E = 4;
     public static final int W = 8;
 
-    //public static final int MAX_WIDTH = 10;
-    //public static final int MAX_HEIGHT = 10;
-
     protected Random random = null;
     private int seed; 
     private int w;
@@ -374,9 +371,6 @@ public class Demo extends javax.swing.JFrame {
 			grid[j][i] = 0;
 		}
 	}
-
-	// draw test
-        //draw();
         
         // fill sets list with tree types
         sets = new ArrayList<List<Demo.Tree>>();
@@ -428,14 +422,9 @@ public class Demo extends javax.swing.JFrame {
             }
             a++;
 	}
-        // draw test
-        //drawText();
+
         drawGraphics();
         
-        // multi-threaded drawing
-        //Draw draw = new Draw(mazePanel, grid);
-        //Thread t = new Thread(draw);
-        //t.start();
         
         
         for(int i = 0; i < grid.length; i++) {
@@ -445,52 +434,6 @@ public class Demo extends javax.swing.JFrame {
             }
             System.out.println();
         }
-        
-}    
-        
-    public void drawText() {
-                mazePanel.getGraphics().clearRect(0, 0, getWidth(), getHeight());
-		// Draw the "top row" of the maze
-		System.out.print((char)27);
-		System.out.print(" ");
-		for ( int i=0; i < w*2 - 1; ++i ) {
-			System.out.print("_");
-		}
-		System.out.println("");
-		
-		// Step through the grid/maze, cell-by-cell
-                int curY = 0;
-                int curX = 0;
-		for ( int y=0; y < grid[0].length; ++y ) {
-                        curY += 10;
-                        curX = 10;
-			System.out.print("|");
-			for ( int x=0; x < grid[0].length; ++x ) {
-				System.out.print( ((grid[y][x] & S) != 0) ? " " : "_" );
-                                if((grid[y][x] & S) == 0) {
-                                    curX += 10;
-                                }
-                                else if((grid[y][x] & S) == 2) {
-                                    curX += 10;
-                                }
-				if ( (grid[y][x] & E) != 0 ) {
-					System.out.print( (((grid[y][x] | grid[y][x+1]) & S) != 0) ? " " : "_" );
-				} else {
-					System.out.print("|");
-				}
-                                
-                                if ( (grid[y][x] & E) == 4 ) {
-                                    if(((grid[y][x] | grid[y][x+1]) & S) == 0)
-                                    {
-                                    }
-                                    else if(((grid[y][x] | grid[y][x+1]) & S) == 2){
-                                    }
-                                } else if ((grid[y][x] & E) == 0) {
-                                }
-			}
-			System.out.println("");
-		}
-                jTextField2.setText(autoGeneratorThread.getState() +"");
     }
     
     
@@ -515,7 +458,7 @@ public class Demo extends javax.swing.JFrame {
                         mazePanel.getGraphics().clearRect(curX, curY-9, 10*grid[0].length, 10);
                         mazePanel.getGraphics().drawLine(curX, curY-10, curX, curY);
 			for ( int x=0; x < grid[0].length; ++x ) {
-                                mazePanel.getGraphics().drawString(grid[y][x]+"", curX+2, curY);
+                                //mazePanel.getGraphics().drawString(grid[y][x]+"", curX+2, curY); // debug
                                 if((grid[y][x] & S) != 0) {
                                     curX += 10;
                                 } else {
@@ -653,84 +596,5 @@ class AutoGenerator implements Runnable {
             } catch(Exception e) {
             }
         }
-    }
-}
-// expiramental threading version of the maze generator
-// would make controls and the program itself run smoother.
-class Generator implements Runnable {
-    private JPanel mazePanel;
-    
-    public static final int N = 1;
-    public static final int S = 2;
-    public static final int E = 4;
-    public static final int W = 8;
-
-    //public static final int MAX_WIDTH = 10;
-    //public static final int MAX_HEIGHT = 10;
-
-    protected Random random = null;
-    private int seed; 
-    private int w;
-    private int h;
-    private int cellWidth = 10;
-    private int cellHeight = 10;
-    private Color wallColor = Color.BLACK;
-    protected int[][] grid = null;
-    
-    private List<List<Demo.Tree>> sets;
-    private Stack<Demo.Edge> edges;
-    
-    Demo demo;
-    
-    public Generator(Demo d, int s, int width, int height) {
-        this.demo = d;
-    }
-
-    public void run() {
-        
-    }
-    
-    private void draw() {
-        int startX = 10;
-                int startY = 10;
-                int curX = 10;
-                int curY = 0;
-                for(int i=0; i < grid[0].length; i++ ) {
-                    curX = (startX + (i*10)) + 10;
-                    mazePanel.getGraphics().drawLine(startX + (i*10), startY, curX, 10);
-                    //try {
-                    //    Thread.sleep(1000);                 //1000 milliseconds is one second.
-                    //} catch(InterruptedException ex) {
-                    //    Thread.currentThread().interrupt();
-                    //}
-		}
-                
-                curX = startX;
-                curY = startY;
-                for ( int y=0; y < grid.length; ++y ) {
-                        curX = startX;
-                        curY += 10;
-                        mazePanel.getGraphics().clearRect(curX, curY-9, 10*grid[0].length, 10);
-                        mazePanel.getGraphics().drawLine(curX, curY-10, curX, curY);
-			for ( int x=0; x < grid[0].length; ++x ) {
-                                if((grid[y][x] & S) != 0) {
-                                    curX += 10;
-                                } else {
-                                    mazePanel.getGraphics().drawLine(curX, curY, curX+10, curY);
-                                    curX += 10;
-                                }
-                                if ( (grid[y][x] & E) != 0 ) {
-                                        if(((grid[y][x] | grid[y][x+1]) & S) != 0) {
-                                        }
-                                        else
-                                        {
-                                            mazePanel.getGraphics().drawLine(curX, curY, curX+10, curY);
-                                        }
-  
-				} else {
-                                        mazePanel.getGraphics().drawLine(curX, curY-10, curX, curY);
-				}   
-			}
-		}
     }
 }
